@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from "cookie-parser";
 import {config} from 'dotenv';
 import morgan from 'morgan';
+import userRoutes from "../server/routes/user.routes"
 config();
 
 const app = express();
@@ -24,6 +25,7 @@ app.use('/ping',function(req,res){
 });
 
 //route of three modules;
+app.use('/api/v1/user',userRoutes)
 
 
 app.all('*',(req,res)=>{
