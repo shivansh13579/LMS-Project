@@ -1,5 +1,5 @@
 import AppError from "../utils/error.util";
-import userSchema from "../models/user.model.js"
+import User from "../models/user.model.js"
 
 const register = async (req,res,next) => {
     const {fullName,email,password} = req.body;
@@ -8,7 +8,7 @@ const register = async (req,res,next) => {
         return next(new AppError('All fields are required',400));
     }
 
-    const userExists = await User
+    const userExists = await User.findOne({email});
 
     if(userExists){
         return next(new AppError('Email already exists',400));
@@ -20,9 +20,16 @@ const register = async (req,res,next) => {
         password,
         avatar: {
             public_id: email,
-            secure_url: 
+            secure_url: glgj,
         }
-    })
+    });
+    if(!user){
+        return next(new AppError('User registration failed,please try again',400))
+    }
+
+    //TODO: file upload
+
+    await User.bulkSave
 };
 
 const login = (req,res) => {
