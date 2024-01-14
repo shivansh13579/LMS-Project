@@ -1,6 +1,6 @@
 import AppError from "../utils/error.util.js";
 import User from "../models/user.model.js";
-import cloudinary from "cloudinary";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const cookieOptions = {
     maxAge: 7 * 24 * 60 * 60 * 1000, //7 days
@@ -9,6 +9,15 @@ const cookieOptions = {
 }
 
 const register = async (req,res,next) => {
+    //get user details from  frontend
+    //validation - not empty
+    //check if user already exists: username,email
+    //check if images,check for avatar
+    //upload them to cloudinary,avatar
+    //create user object - create entry in db
+
+
+
     const {fullName,email,password} = req.body;
 
     if(!fullName || !email || !password){
@@ -20,6 +29,18 @@ const register = async (req,res,next) => {
     if(userExists){
         return next(new AppError('Email already exists',400));
     } 
+
+    avatarLocalPath = req.file?.avatar[0]?.path;
+    if(!avatarLocalPath){
+        return next(new AppError('Avatar file is required',400))
+    }
+
+    const avatar = uploadOnCloudinary(avatarLocalPath);
+
+    if(!avatar){
+        return next(new AppError('Avatar is required',400))
+    }
+
 
     const user = await User.create({
         fullName,
@@ -55,7 +76,7 @@ const register = async (req,res,next) => {
             }
         } catch (e) {
             return next(
-                new AppError(error || ('File not uploaded, please try again',500));
+                new AppError(error || ('File not uploaded, please try again',500))
             )
         }
     }
@@ -66,7 +87,7 @@ const register = async (req,res,next) => {
 
     const token = await user.generateJWTToken();
 
-    res.cookie('token',token,cookieoptions)
+    res.cookie('token',token,cookieOptions)
 
     res.status(201).json({
         success: true,
