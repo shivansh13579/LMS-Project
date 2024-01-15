@@ -46,40 +46,20 @@ const register = async (req,res,next) => {
         fullName,
         email,
         password,
-        avatar: {
-            public_id: email,
-            secure_url: glgj,
-        }
+        avatar: avatar.url
     });
+
     if(!user){
         return next(new AppError('User registration failed,please try again',400))
     }
 
     //TODO: file upload
 
-    if(req.file) {
-        try {
-            const result =await cloudinary.v2.uploader.upload(req.file.path,{
-            folder: 'lms',
-            width: 250,
-            height: 250,
-            gravity: 'faces', 
-            crop: 'fill'
-            });
+            
 
-            if(result) {
-            user.avatar.public_id = result.public_id;
-            user.avatar.secure_url = result.secure_url;
-
-            //Remove file from server
-            fs.rm(`uploads/${req.file.filename}`)
-            }
-        } catch (e) {
-            return next(
-                new AppError(error || ('File not uploaded, please try again',500))
-            )
-        }
-    }
+//   //Remove file from server
+//      fs.rm(`uploads/${req.file.filename}`)
+            
 
     await user.save();
 
@@ -154,6 +134,14 @@ const getProfile = async (req,res) => {
       } catch (error) {
         return next(new AppError('Failed to fetch profile details',500))
       }
+}
+
+const forgotPassword = ()=>{
+
+}
+
+const resetPassword = ()=>{
+    
 }
 
 export {
